@@ -125,6 +125,30 @@ disappears, then you need to add that command to this list."
 (defun springboard-remove-trap ()
   (remove-hook 'pre-command-hook 'springboard-trap-command t))
 
+(defun springboard-current-history ()
+  (let ((recentf-filtered-list
+         (delete
+          nil
+          (mapcar (function
+                   (lambda (elem)
+                     (and (funcall springboard-recentf-filter-function
+                                   elem)
+                          elem)))
+                  recentf-list))))
+    (delete-dups
+     (append (delete
+              nil (mapcar #'(lambda (buf)
+                              (let ((path (buffer-file-name buf)))
+                                (when path
+                                  (if (file-directory-p path)
+                                      path
+                                    (file-name-directory path)))))
+                          (buffer-list)))
+             (mapcar #'file-name-directory
+                     (butlast recentf-filtered-list
+                              (- (length recentf-filtered-list)
+                                 springboard-recentf-cutoff)))))))
+
 ;;;###autoload
 (defun springboard ()
   "`helm'-based command for temporarily changing the default directory."
@@ -137,25 +161,12 @@ disappears, then you need to add that command to this list."
              special-display-buffer-names
              special-display-regexps
              helm-persistent-action-use-special-display
-             (recentf-filtered-list
-              (delete
-               nil
-               (mapcar (function
-                        (lambda (elem)
-                          (and (funcall springboard-recentf-filter-function
-                                        elem)
-                               elem)))
-                       recentf-list)))
              (default-directory
                (helm-comp-read
                 "Springboard: " springboard-directories
                 :test #'file-directory-p
                 :buffer "*Springboard*"
-                :history (delete-dups
-                          (mapcar #'file-name-directory
-                                  (butlast recentf-filtered-list
-                                           (- (length recentf-filtered-list)
-                                              springboard-recentf-cutoff))))
+                :history (springboard-current-history)
                 :input-history 'springboard-history
                 :keymap springboard-map
                 :persistent-action #'dired)))
