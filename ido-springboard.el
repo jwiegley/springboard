@@ -41,26 +41,19 @@
   "Change default-directory for commands invoked at `ido-switch-buffer'."
   :group 'ido)
 
-;; (defvar ido-springboard-map nil)
-
-;; ;;;###autoload
-;; (defun ido-springboard-apply-passthrough-keys ()
-;;   (setq ido-springboard-map (copy-keymap ido-buffer-completion-map))
-;;   (mapc #'(lambda (key) (define-key ido-springboard-map key nil))
-;;         ido-springboard-passthrough-keys))
-
-;; (defcustom ido-springboard-passthrough-keys '([(control ?x)] [open])
-;;   ""
-;;   :set #'(lambda (var value)
-;;            (set var value)
-;;            (ido-springboard-apply-passthrough-keys))
-;;   :type '(repeat (sexp :tag "Key Codes"))
-;;   :group 'ido-springboard)
-
-(defcustom ido-springboard-ignored-commands '(self-insert-command
-                                              delete-backward-char
-                                              abort-recursive-edit
-                                              switch-to-buffer)
+(defcustom ido-springboard-ignored-commands
+  '(self-insert-command
+    delete-backward-char
+    abort-recursive-edit
+    exit-minibuffer
+    switch-to-buffer
+    backward-char
+    forward-char
+    kill-line
+    move-beginning-of-line
+    move-end-of-line
+    backward-kill-word
+    forward-kill-word)
   "Commands that will not be trapped by Ido-Springboard."
   :type '(repeat command)
   :group 'ido-springboard)
@@ -87,21 +80,15 @@
   (unless ido-springboard-trapped
     (condition-case err
         (unless (or (memq this-command ido-springboard-ignored-commands)
-                    (let ((command-name (symbol-name this-command)))
-                     (and (string-match "\\`ido-" command-name)
-                          (not (string-match "\\`ido-\\(find-file\\)"
-                                             command-name))))
-                    ;; (where-is-internal this-command
-                    ;;                    (list ido-springboard-map) t
-                    )
+                    (string-match "\\`ido-" (symbol-name this-command)))
           (let ((dir (ido-springboard-match-directory)))
             (when dir
-              ;; (message "Trapped command: %s" this-command)
-              (setq ido-springboard-trapped t)
+              (message "Trapped command: %s" this-command)
               (loop for buf in (buffer-list)
                     when (minibufferp buf)
                     do (with-current-buffer buf
                          (ido-springboard-remove-trap)))
+              (setq ido-springboard-trapped t)
               (throw 'abort dir))))
       (error
        (message "Error occurred: %s" err)))))
@@ -121,14 +108,9 @@
   (unwind-protect
       (let* (ido-springboard-trapped
              ido-springboard-already-trapped
-             (default-directory default-directory))
-        (let ((default-directory (catch 'abort
-                                   (ignore ad-do-it))))
-          (when default-directory
-            ;; (message "Directory: %s; Trapped: %s" default-directory
-            ;;          ido-springboard-trapped)
-            (if ido-springboard-trapped
-                (call-interactively this-command)))))
+             (default-directory (catch 'abort (ignore ad-do-it))))
+        (if default-directory
+            (call-interactively this-command)))
     (remove-hook 'minibuffer-setup-hook 'ido-springboard-add-trap)
     (remove-hook 'minibuffer-exit-hook 'ido-springboard-remove-trap)))
 
