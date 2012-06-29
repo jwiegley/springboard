@@ -68,28 +68,33 @@
 (eval-when-compile
   (defvar ido-springboard-trapped nil))
 
+(defun ido-springboard-match-directory ()
+  (let ((item (or (let ((buf (get-buffer (car ido-matches))))
+                    (and buf
+                         (with-current-buffer buf
+                           default-directory)))
+                  (and ido-use-virtual-buffers ido-virtual-buffers
+                       (cdr (assoc (car ido-matches)
+                                   ido-virtual-buffers))))))
+    (cond ((file-directory-p item)
+           item)
+          ((file-exists-p item)
+           (file-name-directory item))
+          (t
+           nil))))
+
 (defun ido-springboard-trap-command ()
   (unless ido-springboard-trapped
     (condition-case err
         (unless (or (memq this-command ido-springboard-ignored-commands)
+                    (let ((command-name (symbol-name this-command)))
+                     (and (string-match "\\`ido-" command-name)
+                          (not (string-match "\\`ido-\\(find-file\\)"
+                                             command-name))))
                     ;; (where-is-internal this-command
                     ;;                    (list ido-springboard-map) t
                     )
-          (let ((dir
-                 (let ((item
-                        (or (let ((buf (get-buffer (car ido-matches))))
-                              (and buf
-                                   (with-current-buffer buf
-                                     default-directory)))
-                            (and ido-use-virtual-buffers ido-virtual-buffers
-                                 (cdr (assoc (car ido-matches)
-                                             ido-virtual-buffers))))))
-                   (cond ((file-directory-p item)
-                          item)
-                         ((file-exists-p item)
-                          (file-name-directory item))
-                         (t
-                          nil)))))
+          (let ((dir (ido-springboard-match-directory)))
             (when dir
               (message "Trapped command: %s" this-command)
               (setq ido-springboard-trapped t)
