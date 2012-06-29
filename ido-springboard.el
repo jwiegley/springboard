@@ -83,7 +83,7 @@
                     (string-match "\\`ido-" (symbol-name this-command)))
           (let ((dir (ido-springboard-match-directory)))
             (when dir
-              (message "Trapped command: %s" this-command)
+              ;; (message "Trapped command: %s" this-command)
               (loop for buf in (buffer-list)
                     when (minibufferp buf)
                     do (with-current-buffer buf
