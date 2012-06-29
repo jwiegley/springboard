@@ -96,7 +96,7 @@
                     )
           (let ((dir (ido-springboard-match-directory)))
             (when dir
-              (message "Trapped command: %s" this-command)
+              ;; (message "Trapped command: %s" this-command)
               (setq ido-springboard-trapped t)
               (loop for buf in (buffer-list)
                     when (minibufferp buf)
@@ -125,8 +125,8 @@
         (let ((default-directory (catch 'abort
                                    (ignore ad-do-it))))
           (when default-directory
-            (message "Directory: %s; Trapped: %s" default-directory
-                     ido-springboard-trapped)
+            ;; (message "Directory: %s; Trapped: %s" default-directory
+            ;;          ido-springboard-trapped)
             (if ido-springboard-trapped
                 (call-interactively this-command)))))
     (remove-hook 'minibuffer-setup-hook 'ido-springboard-add-trap)
