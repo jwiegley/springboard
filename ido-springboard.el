@@ -1,4 +1,4 @@
-;;; ido-springboard --- Temporarily change default-directory for one command
+;;; ido-springboard.el --- Temporarily change default-directory for one command
 
 ;; Copyright (C) 2012 John Wiegley
 
