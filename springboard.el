@@ -1,4 +1,4 @@
-;;; springboard --- Temporarily change default-directory for one command
+;;; springboard.el --- Temporarily change default-directory for one command
 
 ;; Copyright (C) 2012 John Wiegley
 
@@ -6,6 +6,7 @@
 ;; Created: 13 Jun 2012
 ;; Version: 1.0
 ;; Keywords: helm
+;; Package-Requires: ((helm "1.6.9"))
 ;; X-URL: https://github.com/jwiegley/springboard
 
 ;; This program is free software; you can redistribute it and/or
