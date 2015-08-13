@@ -102,6 +102,12 @@ disappears, then you need to add that command to this list."
   (defvar springboard-trapped nil)
   (defvar springboard-already-trapped nil))
 
+(defun springboard-add-trap ()
+  (add-hook 'pre-command-hook 'springboard-trap-command t t))
+
+(defun springboard-remove-trap ()
+  (remove-hook 'pre-command-hook 'springboard-trap-command t))
+
 (defun springboard-trap-command ()
   (unless springboard-already-trapped
     (condition-case err
@@ -119,12 +125,6 @@ disappears, then you need to add that command to this list."
           (helm-confirm-and-exit-minibuffer))
       (error
        (message "Error occurred: %s" err)))))
-
-(defun springboard-add-trap ()
-  (add-hook 'pre-command-hook 'springboard-trap-command t t))
-
-(defun springboard-remove-trap ()
-  (remove-hook 'pre-command-hook 'springboard-trap-command t))
 
 (defun springboard-current-history ()
   (let ((recentf-filtered-list
