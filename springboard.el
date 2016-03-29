@@ -44,6 +44,8 @@
 ;; Springboard disappears, and if your command needs minibuffer input, you'll
 ;; now be in the minibuffer for that new command.
 
+;;; Code:
+
 (require 'helm)
 (require 'recentf)
 (require 'dired)
