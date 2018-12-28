@@ -32,13 +32,7 @@ input, you'll now be in the minibuffer for that new command.
 Here is an example use-package form for using ivy-springboard package:
 
 ```
-(provide 'my-springboard-config)
-
 (use-package ivy-springboard
-   :defer t
-   :load-path (lambda () (expand-file-name "github.com/analyticd/springboard" ghq-root))
-   :config
-   (custom-set-variables
-    '(springboard-directories (list (expand-file-name "OrgModeFiles" org-repo)
-                                    "~/elisp"))))
+   :demand t
+   :load-path "/path/to/springboard directory")
 ```
